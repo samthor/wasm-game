@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="module">
+
+import * as utils from './utils.js';
+
+(async function() {
+  const f = window.fetch('./game.wasm').then((response) => response.arrayBuffer());
+  const bytes = await f;
+
+  const {wa, memory} = await utils.create(bytes);
+  const alloc = new utils.Alloc(memory);
+  const exports = wa.instance.exports;
+
+  const context = canvas.getContext('2d');
+  const imageData = context.createImageData(canvas.width, canvas.height);
+
+  // create screen buffer
+  const gameBuffer = alloc.alloc(imageData.data.length);
+  const res = exports._game_setup(alloc.at(gameBuffer), imageData.width, imageData.height);
+
+  // create and copy asset buffer
+  const assetImageData = await utils.loadImageData('./asset.png');
+  const assetBuffer = alloc.copy(assetImageData.data);
+  exports._asset_setup(alloc.at(assetBuffer), assetImageData.width, assetImageData.height);
+
+  // main game render
+  const render = () => {
+    const out = exports._game_render();
+    if (out > 0) {
+      imageData.data.set(gameBuffer);
+      context.putImageData(imageData, 0, 0);
+    } else if (out < 0) {
+      console.warn('rendering error', out);
+    }
+    return out;
+  };
+
+  const run = () => {
+    window.requestAnimationFrame(() => {
+      const o = render();
+      run();
+    });
+  };
+  run();
+
+}());
+
+  </script>
+</head>
+<body>
+
+<canvas width="320" height="240" id="canvas" style="width: 640px; height: 480px; image-rendering: pixelated;"></canvas>
+
+</body>
+</html>
