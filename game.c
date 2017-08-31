@@ -26,17 +26,19 @@ int clear() {
   return 0;
 }
 
-static int px = 0;
-static int py = 0;
+static int px = 32;
+static int py = 32;
+
+EMSCRIPTEN_KEEPALIVE
+int game_move(int dx, int dy) {
+  px += dx;
+  py += dy;
+  return 0;
+}
 
 EMSCRIPTEN_KEEPALIVE
 int game_render() {
   // TODO stuff
-
-  px += 1;
-  if (px >= screen.w) {
-    px = 0;
-  }
 
   clear();
 
@@ -49,8 +51,8 @@ int game_render() {
     }
   }
 
-  spriteset_blit_trans(&assets, 1, &screen, px, 16);
-  spriteset_blit_trans(&assets, 3, &screen, px, 32);
+  spriteset_blit_trans(&assets, 1, &screen, px, py-16);
+  spriteset_blit_trans(&assets, 3, &screen, px, py);
 
   return 1;  // something changed
 }

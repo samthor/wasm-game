@@ -25,6 +25,31 @@ import * as utils from './utils.js';
   const assetBuffer = alloc.copy(assetImageData.data);
   exports._asset_setup(alloc.at(assetBuffer), assetImageData.width, assetImageData.height);
 
+  // listen for keyboard
+  document.addEventListener('keydown', (ev) => {
+    let dx = 0;
+    let dy = 0;
+
+    switch (ev.key) {
+    case 'ArrowUp':
+      dy = -1;
+      break;
+    case 'ArrowDown':
+      dy = +1;
+      break;
+    case 'ArrowLeft':
+      dx = -1;
+      break;
+    case 'ArrowRight':
+      dx = +1;
+      break;
+    default:
+      return false;
+    }
+
+    exports._game_move(dx, dy);
+  });
+
   // main game render
   const render = () => {
     const out = exports._game_render();
