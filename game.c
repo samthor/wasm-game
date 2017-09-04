@@ -43,8 +43,8 @@ int game_render() {
   clear();
 
   int c = 0;
-  for (int x = 0; x < 10; ++x) {
-    for (int y = 0; y < 5; ++y) {
+  for (int x = 0; x < 40; ++x) {
+    for (int y = 0; y < 30; ++y) {
       ++c;
       int asset = (c % 2) ? 0 : 2;
       spriteset_blit(&assets, asset, &screen, x * 16, y * 16);

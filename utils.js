@@ -6,6 +6,16 @@
  */
 export async function create(bytes, callbacks={}) {
   const memory = new WebAssembly.Memory({initial: 256, maximum: 256});
+  const buffer = new Uint8Array(memory.buffer);
+
+  const stdlib = {
+    memcpy: function(dst, src, n) {
+      buffer.copyWithin(dst, src, src + n);
+    },
+    memset: function(dst, c, n) {
+      buffer.fill(c, dst, dst + n);
+    },
+  };
 
   const importObject = (function() {
     const env = {
@@ -20,6 +30,9 @@ export async function create(bytes, callbacks={}) {
     };
     for (const key in callbacks) {
       env['_' + key] = callbacks[key];
+    }
+    for (const key in stdlib) {
+      env['_' + key] = stdlib[key];
     }
     return {env};
   }());
@@ -65,17 +78,6 @@ export class Alloc {
   constructor(memory) {
     this.memory_ = memory;
     this.position_ = memory.buffer.byteLength;
-
-    /** @type {!WeakMap<!Uint8ClampedArray, number>} */
-    this.buffers_ = new WeakMap();
-  }
-
-  /**
-   * @param {!Uint8ClampedArray} buffer
-   * @return {number}
-   */
-  at(buffer) {
-    return this.buffers_.get(buffer) || -1;
   }
 
   /**
@@ -85,12 +87,9 @@ export class Alloc {
   alloc(size) {
     let at = this.position_ - size;
     at -= (at % 8);  // put on boundary
-    const buffer = new Uint8ClampedArray(this.memory_.buffer, at, size);
-
     this.position_ = at;
 
-    this.buffers_.set(buffer, at);
-    return buffer;
+    return new Uint8ClampedArray(this.memory_.buffer, at, size);
   }
 
   /**

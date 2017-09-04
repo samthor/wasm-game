@@ -1,6 +1,6 @@
 
 #include <string.h>
-
+/*
 void *memset(void *dst, int c, size_t n) {
   if (n) {
     char *d = dst;
@@ -21,3 +21,4 @@ void *memcpy(void *restrict dst, const void *restrict src, size_t n) {
   }
   return orig;
 }
+*/

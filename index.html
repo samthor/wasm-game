@@ -18,12 +18,12 @@ import * as utils from './utils.js';
 
   // create screen buffer
   const gameBuffer = alloc.alloc(imageData.data.length);
-  const res = exports._game_setup(alloc.at(gameBuffer), imageData.width, imageData.height);
+  const res = exports._game_setup(gameBuffer.byteOffset, imageData.width, imageData.height);
 
   // create and copy asset buffer
   const assetImageData = await utils.loadImageData('./asset.png');
   const assetBuffer = alloc.copy(assetImageData.data);
-  exports._asset_setup(alloc.at(assetBuffer), assetImageData.width, assetImageData.height);
+  exports._asset_setup(assetBuffer.byteOffset, assetImageData.width, assetImageData.height);
 
   // listen for keyboard
   document.addEventListener('keydown', (ev) => {
@@ -76,7 +76,7 @@ import * as utils from './utils.js';
 </head>
 <body>
 
-<canvas width="320" height="240" id="canvas" style="width: 640px; height: 480px; image-rendering: pixelated;"></canvas>
+<canvas width="640" height="480" id="canvas" style="width: 640px; height: 480px; image-rendering: pixelated;"></canvas>
 
 </body>
 </html>

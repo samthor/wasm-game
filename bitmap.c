@@ -8,16 +8,6 @@ uint32_t *bitmap_offset(bitmap_t *s, int x, int y) {
   return s->at + ((s->w * y) + x);
 }
 
-int memcpy_word(uint32_t *restrict dst, const uint32_t *restrict src, int n) {
-  while (n > 0) {
-    dst[0] = src[0];
-    ++dst;
-    ++src;
-    --n;
-  }
-  return 0;
-}
-
 int spriteset_blit(bitmap_t *from, int i, bitmap_t *to, int x, int y) {
   int fx = (i * DIM) % from->w;
   int fy = ((i * DIM) / from->w) * DIM;
@@ -26,7 +16,7 @@ int spriteset_blit(bitmap_t *from, int i, bitmap_t *to, int x, int y) {
   uint32_t *dst = bitmap_offset(to, x, y);
 
   for (int j = 0; j < DIM; ++j) {
-    memcpy_word(dst, src, DIM);
+    memcpy(dst, src, DIM * sizeof(uint32_t));
     src += from->w;
     dst += to->w;
   }
